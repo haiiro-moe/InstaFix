@@ -2,7 +2,7 @@ package model
 
 type ViewsData struct {
 	Card        string
-	Title       string `default:"InstaFix"`
+	Title       string `default:"Gakkou Instagram Club"`
 	ImageURL    string `default:""`
 	VideoURL    string `default:""`
 	URL         string
