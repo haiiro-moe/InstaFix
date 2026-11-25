@@ -21,3 +21,9 @@
 
 # ...even if they are in subdirectories
 !*/
+
+# Nix
+!flake.nix
+!flake.lock
+result
+result-*
