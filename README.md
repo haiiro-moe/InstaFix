@@ -41,6 +41,21 @@ Replace the first two characters of instagram.com with fx.
 3. Optional: Use the Docker Compose file in [./scripts/docker-compose.yml](./scripts/docker-compose.yml). If not using Kubernetes, it's also highly recommended to add a Haproxy instance to loadbalance between 3 instances or more.
 4. Optional: Use a [Kubernetes Deployment file](./scripts/k8s/instafix-deployment.yaml) and a [Kubernetes Ingress configuration file](./scripts/k8s/instafix-ingress.yaml) to deploy to a Kubernetes cluster (with 10 replicas) by issuing `kubectl apply -f .` over the `./scripts/k8s/` folder. [TODO: CockroachDB is not shared between replicas at application level, extract Cockroach into its own Service and allow replicas to communicate to it].
 
+## Nix / NixOS
+
+A flake (x86_64-linux and aarch64-linux) provides a static build, a runnable app and a dev shell. It needs flakes enabled (`experimental-features = nix-command flakes`).
+
+```sh
+nix build                                  # ./result/bin/instafix (static, -s -w, tags netgo,osusergo)
+nix run . -- -listen 127.0.0.1:3000        # build and run; writes cache.db and static/ to the cwd
+nix develop                                # shell with go, gopls, gotools
+nix develop -c go vet ./...                # checks (there are no tests)
+```
+
+- The package builds with the Go from nixpkgs, which is newer than the `go 1.23.2` in `go.mod`, so it satisfies it.
+- After changing `go.mod` or `go.sum`, update `vendorHash` in `flake.nix`: set it to `pkgs.lib.fakeHash`, run `nix build`, and paste the hash Nix prints.
+- The flake only sees git-tracked files, so `git add` new files before `nix build`. `.gitignore` is an allowlist, so non-Go files need an entry or `git add -f`.
+
 ## Using iOS shortcut (contributed by @JohnMcAnearney)
 You can use the iOS shortcut found here: [Embed in Discord](https://www.icloud.com/shortcuts/3412a4c344fd4c6f99924e525dd3c0a2), in order to quickly embed content using InstaFix. The shortcut works by grabbing the url of the Instagram content you're trying to share, automatically appends 'dd' to where it needs to be, copies this to your device's clipboard and opens Discord. 
 
